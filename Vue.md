@@ -284,3 +284,307 @@ SPA仅在页面初始化加载相应的HTML、CSS、JS。一旦加载完，SPA�
 缺点：首屏加载时间较长、SEO不友好、路由管理较复杂
 ```
 
+### **key的原理**
+
+vue中的key有什么作用？（key的内部原理）
+
+了解vue中key的原理需要一些前置知识。
+
+就是vue的虚拟dom，vue会根据 data中的数据生成虚拟dom，如果是第一次生成页面，就将虚拟dom转成真实dom，在页面展示出来。
+
+虚拟dom有啥用？每次vm._data 中的数据更改，都会触发生成新的虚拟dom，新的虚拟dom会跟旧的虚拟dom进行比较，如果有相同的，在生成真实dom时，这部分相同的就不需要重新生成，只需要将两者之间不同的dom转换成真实dom，再与原来的真实dom进行拼接。我的理解是虚拟dom就是起到了一个dom复用的作用，还有避免重复多余的操作，下文有详细解释。
+
+
+
+而key有啥用？
+
+key是虚拟dom的标识。
+
+
+
+先来点预备的知识：啥是真实 DOM？真实 DOM 和 虚拟 DOM 有啥区别？如何用代码展现真实 DOM 和 虚拟 DOM
+
+#### 真实`DOM`和其解析流程
+
+这里参考超级英雄大佬：https://juejin.cn/post/6844903895467032589
+
+`webkit` 渲染引擎工作流程图
+
+![img](https://img-blog.csdnimg.cn/img_convert/b32d88931ee775d57b382d7585de3ad8.png)
+
+> 中文版
+
+![img](https://img-blog.csdnimg.cn/img_convert/cd1757feee540ef20c50b81af16d75ca.png)
+
+
+
+ 所有的浏览器渲染引擎工作流程大致分为5步：创建 `DOM` 树 —> 创建 `Style Rules` -> 构建 `Render` 树 —> 布局 `Layout` -—> 绘制 `Painting`。
+
+* 第一步，构建 DOM 树：当浏览器接收到来自服务器响应的HTML文档后，会遍历文档节点，生成DOM树。需要注意的是在DOM树生成的过程中有可能会被CSS和JS的加载执行阻塞，渲染阻塞下面会讲到。
+
+* 第二步，生成样式表：用 CSS 分析器，分析 CSS 文件和元素上的 inline 样式，生成页面的样式表；
+
+* 渲染阻塞：当浏览器遇到一个script标签时，DOM构建将暂停，直到脚本加载执行，然后继续构建DOM树。每次去执行Javascript脚本都会严重阻塞DOM树构建，如果JavaScript脚本还操作了CSSOM，而正好这个CSSOM没有下载和构建，那么浏览器甚至会延迟脚本执行和构建DOM，直到这个CSSOM的下载和构建。所以，script标签引入很重要，实际使用时可以遵循下面两个原则：
+
+  * css优先：引入顺序上，css资源先于js资源
+
+  * js后置：js代码放在底部，且js应尽量少影响DOM构建
+
+    > 还有一个小知识：当解析html时，会把新来的元素插入dom树里，同时去查找css，然后把对应的样式规则应用到元素上，查找样式表是按照从右到左的顺序匹配的例如：div p {...}，会先寻找所有p标签并判断它的父标签是否为div之后才决定要不要采用这个样式渲染。所以平时写css尽量用class或者id，不要过度层叠
+
+* 第三步，构建渲染树：通过DOM树和CSS规则我们可以构建渲染树。浏览器会从DOM树根节点开始遍历每个可见节点(注意是可见节点)对每个可见节点，找到其适配的CSS规则并应用。渲染树构建完后，每个节点都是可见节点并且都含有其内容和对应的规则的样式。这也是渲染树和DOM树最大的区别所在。渲染是用于显示，那些不可见的元素就不会在这棵树出现了。除此以外，display none的元素也不会被显示在这棵树里。visibility hidden的元素会出现在这棵树里。
+
+* 第四步，**渲染布局**：布局阶段会从渲染树的根节点开始遍历，然后确定每个节点对象在页面上的确切大小与位置，布局阶段的输出是一个盒子模型，它会精确地捕获每个元素在屏幕内的确切位置与大小。
+
+* 第五步，**渲染树绘制**：在绘制阶段，遍历渲染树，调用渲染器的paint()方法在屏幕上显示其内容。渲染树的绘制工作是由浏览器的UI后端组件完成的。
+
+**注意点：**
+
+**1、`DOM` 树的构建是文档加载完成开始的？** 构建 `DOM` 树是一个渐进过程，为达到更好的用户体验，渲染引擎会尽快将内容显示在屏幕上，它不必等到整个 `HTML` 文档解析完成之后才开始构建 `render` 树和布局。
+
+**2、`Render` 树是 `DOM` 树和 `CSS` 样式表构建完毕后才开始构建的？** 这三个过程在实际进行的时候并不是完全独立的，而是会有交叉，会一边加载，一边解析，以及一边渲染。
+
+**3、`CSS` 的解析注意点？** `CSS` 的解析是从右往左逆向解析的，嵌套标签越多，解析越慢。
+
+**4、`JS` 操作真实 `DOM` 的代价？**传统DOM结构操作方式对性能的影响很大，原因是频繁操作DOM结构操作会引起页面的重排(reflow)和重绘(repaint)，浏览器不得不频繁地计算布局，重新排列和绘制页面元素，导致浏览器产生巨大的性能开销。直接操作真实`DOM`的性能特别差，我们可以来演示一遍。
+
+```js
+<div id="app"></div>
+<script>
+    // 获取 DIV 元素
+    let box = document.querySelector('#app');
+    console.log(box);
+
+    // 真实 DOM 操作
+    console.time('a');
+    for (let i = 0; i <= 10000; i++) {
+        box.innerHTML = i;
+    }
+    console.timeEnd('a');
+
+    // 虚拟 DOM 操作
+    let num = 0;
+    console.time('b');
+    for (let i = 0; i <= 10000; i++) {
+        num = i;
+    }
+    box.innerHTML = num;
+    console.timeEnd('b');
+
+</script>
+```
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/0740cb16f1354358bed6ef638b90ebfe.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5qC86Zu354uQ5oCd,size_19,color_FFFFFF,t_70,g_se,x_16)
+
+
+>从结果中可以看出，操作真实 DOM 的性能是非常差的，所以我们要尽可能的复用，减少 DOM 操作。
+
+
+
+
+
+#### **虚拟 DOM 的好处**
+
+​	虚拟 `DOM` 就是为了解决浏览器性能问题而被设计出来的。如前，若一次操作中有 10 次更新 `DOM` 的动作，虚拟 `DOM` 不会立即操作 `DOM`，而是将这 10 次更新的 `diff` 内容保存到本地一个 `JS` 对象中，最终将这个 `JS` 对象一次性 `attch` 到 `DOM` 树上，再进行后续操作，避免大量无谓的计算量。所以，用 `JS` 对象模拟 `DOM` 节点的好处是，页面的更新可以先全部反映在 `JS` 对象(虚拟 `DOM` )上，操作内存中的 `JS` 对象的速度显然要更快，等更新完成后，再将最终的 `JS` 对象映射成真实的 `DOM`，交由浏览器去绘制。
+
+​	虽然这一个虚拟 DOM 带来的一个优势，但并不是全部。虚拟 DOM 最大的优势在于抽象了原本的渲染过程，实现了跨平台的能力，而不仅仅局限于浏览器的 DOM，可以是安卓和 IOS 的原生组件，可以是近期很火热的小程序，也可以是各种GUI。
+
+​	回到最开始的问题，虚拟 DOM 到底是什么，说简单点，就是一个普通的 JavaScript 对象，包含了 `tag`、`props`、`children` 三个属性。
+
+> 接下来我们手动实现下 虚拟 DOM。
+>
+> 分两种实现方式：
+>
+> 一种原生 js DOM 操作实现；
+>
+> 另一种主流虚拟 DOM 库（snabbdom、virtual-dom）的实现（用h函数渲染）（暂时还不理解）
+
+
+
+**算法实现**
+
+**（1）**用 JS 对象模拟 DOM 树：
+
+```html
+<div id="virtual-dom">
+    <p>Virtual DOM</p>
+    <ul id="list">
+      <li class="item">Item 1</li>
+      <li class="item">Item 2</li>
+      <li class="item">Item 3</li>
+    </ul>
+    <div>Hello World</div>
+</div> 
+```
+
+我们用 `JavaScript` 对象来表示 `DOM` 节点，使用对象的属性记录节点的类型、属性、子节点等。
+
+```js
+/**
+ * Element virdual-dom 对象定义
+ * @param {String} tagName - dom 元素名称
+ * @param {Object} props - dom 属性
+ * @param {Array<Element|String>} - 子节点
+ */
+function Element(tagName, props, children) {
+    this.tagName = tagName;
+    this.props = props;
+    this.children = children;
+    // dom 元素的 key 值，用作唯一标识符
+    if (props.key) {
+        this.key = props.key
+    }
+}
+function el(tagName, props, children) {
+    return new Element(tagName, props, children);
+}
+```
+
+构建虚拟的  `DOM`  ，用 javascript 对象来表示
+
+```js
+let ul = el('div', { id: 'Virtual DOM' }, [
+    el('p', {}, ['Virtual DOM']),
+    el('ul', { id: 'list' }, [
+        el('li', { class: 'item' }, ['Item 1']),
+        el('li', { class: 'item' }, ['Item 2']),
+        el('li', { class: 'item' }, ['Item 3'])
+    ]),
+    el('div', {}, ['Hello, World'])
+])
+```
+
+现在 `ul` 就是我们用 `JavaScript` 对象表示的 `DOM` 结构，我们输出查看 `ul` 对应的数据结构如下：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/9fb2a6336a61477c8ea39677716d1f52.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5qC86Zu354uQ5oCd,size_20,color_FFFFFF,t_70,g_se,x_16)
+
+
+**（2）**将用 js 对象表示的虚拟 DOM 转换成真实 DOM：需要用到 js 原生操作 DOM 的方法。
+
+```js
+/**
+ * render 将virdual-dom 对象渲染为实际 DOM 元素
+ */
+Element.prototype.render = function () {
+    // 创建节点
+    let el = document.createElement(this.tagName);
+
+    let props = this.props;
+    // 设置节点的 DOM 属性
+    for (let propName in props) {
+        let propValue = props[propName];
+        el.setAttribute(propName, propValue)
+    }
+
+    let children = this.children || []
+    for (let child of children) {
+        let childEl = (child instanceof Element)
+        ? child.render() // 如果子节点也是虚拟 DOM, 递归构建 DOM 节点
+        : document.createTextNode(child) // 如果是文本，就构建文本节点
+
+        el.appendChild(childEl);
+    }
+
+    return el;
+}
+```
+
+我们通过查看以上 `render` 方法，会根据 `tagName` 构建一个真正的 `DOM` 节点，然后设置这个节点的属性，最后递归地把自己的子节点也构建起来。
+
+我们将构建好的 `DOM` 结构添加到页面 `body` 上面，如下：
+
+```js
+let ulRoot = ul.render();
+document.body.appendChild(ulRoot);
+```
+
+这样，页面 `body` 里面就有真正的 `DOM` 结构，效果如下图所示：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/41bf566f214f4c1f943b9a3dddfc6f19.png?x-oss-process=image/watermark,type_d3F5LXplbmhlaQ,shadow_50,text_Q1NETiBA5qC86Zu354uQ5oCd,size_19,color_FFFFFF,t_70,g_se,x_16)
+
+
+
+
+> 我们知道虚拟 DOM 的好处和虚拟 DOM 的实现后就要讲讲 key 的作用了。
+>
+> 贴一下上面实现地完整代码
+
+```html
+<script>
+    /**
+         * Element virdual-dom 对象定义
+         * @param {String} tagName - dom 元素名称
+         * @param {Object} props - dom 属性
+         * @param {Array<Element|String>} - 子节点
+         */
+    function Element(tagName, props, children) {
+        this.tagName = tagName;
+        this.props = props;
+        this.children = children;
+        // dom 元素的 key 值，用作唯一标识符
+        if (props.key) {
+            this.key = props.key
+        }
+    }
+
+    function el(tagName, props, children) {
+        return new Element(tagName, props, children);
+    }
+
+    let ul = el('div', { id: 'Virtual DOM' }, [
+        el('p', {}, ['Virtual DOM']),
+        el('ul', { id: 'list' }, [
+            el('li', { class: 'item' }, ['Item 1']),
+            el('li', { class: 'item' }, ['Item 2']),
+            el('li', { class: 'item' }, ['Item 3'])
+        ]),
+        el('div', {}, ['Hello, World'])
+    ])
+
+    /**
+             * render 将virdual-dom 对象渲染为实际 DOM 元素
+             */
+    Element.prototype.render = function () {
+        // 创建节点
+        let el = document.createElement(this.tagName);
+
+        let props = this.props;
+        // 设置节点的 DOM 属性
+        for (let propName in props) {
+            let propValue = props[propName];
+            el.setAttribute(propName, propValue)
+        }
+
+        let children = this.children || []
+        for (let child of children) {
+            let childEl = (child instanceof Element)
+            ? child.render() // 如果子节点也是虚拟 DOM, 递归构建 DOM 节点
+            : document.createTextNode(child) // 如果是文本，就构建文本节点
+
+            el.appendChild(childEl);
+        }
+
+        return el;
+    }
+
+    let ulRoot = ul.render();
+    document.body.appendChild(ulRoot);
+    console.log(ul);
+</script>
+```
+
+
+
+
+
+
+
+#### **虚拟DOM中key的作用**
+
+key是虚拟DOM对象的标识，当数据发生变化时，Vue会根据【新数据】生成【新的虚拟DOM】, 随后Vue进行【新虚拟DOM】与【旧虚拟DOM】的差异比较，比较规则如下：
+
+* 旧虚拟DOM中找到了与新虚拟DOM相同的key：
+  * ①.若虚拟DOM中内容没变, 直接使用之前的真实DOM！
+  * ②.若虚拟DOM中内容变了, 则生成新的真实DOM，随后替换掉页面中之前的真实DOM。
+* 旧虚拟DOM中未找到与新虚拟DOM相同的key
+  * 创建新的真实DOM，随后渲染到到页面。
