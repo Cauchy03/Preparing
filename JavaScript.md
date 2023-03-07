@@ -295,7 +295,7 @@ fun1.bind({id: 'Obj'})();   // 'Global'
 ```
 Promise.all()可以将多个Promise实例包装成一个新的Promise，成功时返回一个结果数组，如果失败则返回第一个失败Promise的值
 
-Promise.allsettled()也是将多个多个Promise包装成一个新的Promise，不管成功还是失败，都返回一个包含所有Promise结果状态的数组
+Promise.allsettled()也是将多个Promise包装成一个新的Promise，不管成功还是失败，都返回一个包含所有Promise结果状态的数组
 
 Promise.race()，传入一个包含多个Promise实例的数组，返回一个新的Promise，第一个完成Promise结果状态就是最终的结果状态
 ```
@@ -893,3 +893,31 @@ Array.from(arr)
 - 不可设置的(Non-configurable)属性不能被移除。这意味着像`Math`, `Array`， `Object`内置对象的属性以及使用`Object.defineProperty()`方法设置为不可设置的属性不能被删除。
 
 **2.** `obj[key] = undefined;` 这个选择不是这个问题的正确答案，因为只是把某个属性替换为`undefined`，属性本身还在。但是，如果你小心使用它，你可以大大加快一些算法。
+
+## Object.freeze()和Object.seal()
+
+```
+Object.freeze()方法可以冻结一个对象。一个被冻结的对象再也不能被修改；冻结了一个对象则不能向这个对象添加新的属性，不能删除已有属性，不能修改该对象已有属性的可枚举性、可配置性、可写性，以及不能修改已有属性的值。此外，冻结一个对象后该对象的原型也不能被修改。freeze() 返回和传入的参数相同的对象。
+```
+
+**Object.freeze()做了哪些事情？**
+
+设置Object.preventExtension()，禁止添加新属性(绝对存在)
+设置writable为false，禁止修改(绝对存在)
+设置configurable为false，禁止配置(绝对存在)
+禁止更改访问器属性(getter和setter)
+
+```
+Object.seal()方法封闭一个对象，阻止添加新属性并将所有现有属性标记为不可配置。当前属性的值只要可写就可以改变。
+```
+
+**Object.seal()做了哪些事情？**
+
+- 设置Object.preventExtension()，禁止添加新属性(绝对存在)
+- 设置configurable为false，禁止配置(绝对存在)
+- 禁止更改访问器属性(getter和setter)
+
+**对比Object.freeze()和Object.seal()**
+
+使用`Object.freeze()`冻结的对象中的现有属性是不可变的。用`Object.seal()`密封的对象可以改变其现有属性。**Object.seal()封闭比Object.freez()多一个writable:false**
+
