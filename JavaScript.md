@@ -524,7 +524,7 @@ try{
 ## 23. `js`如何判断数组类型
 
 ```
-Array.isArray()，instanceof，constructor，原型链的方式，Array.prototype.isprototypeOf()，Object.getprototypeOf(),Object.prototype.toString().call(obj)
+Array.isArray()，instanceof，constructor，原型链的方式，Array.prototype.isprototypeOf()，Object.getprototypeOf(),Object.prototype.toString.call(obj)
 ```
 
 ```js
