@@ -1186,3 +1186,11 @@ flexible 适配在rem的基础上通过js动态设置根字体
 viewport 适配方案 只要采用vw，vh，vmin，vmax单位做到根据可视化窗口大小改变而改变
 ```
 
+## 鼠标事件
+
+```
+mouseover和mouseout：当鼠标移入移出元素或子元素都会触发事件。（支持冒泡）
+mouseenter和mouseleave：当鼠标移入移出元素才会触发事件。（不支持冒泡）
+hover的效果等同于mouseenter，mouseleave。
+```
+
