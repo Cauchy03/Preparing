@@ -883,3 +883,31 @@ Object.seal()方法封闭一个对象，阻止添加新属性并将所有现有�
 ## eval()函数
 
 ## null和undefined的区别
+
+## 点击下载本地文件
+
+- window.open(url, '_self')
+
+- a标签有一个download属性  <a download='demo'></a>可以直接下载，属性值为下载的文件名
+
+  封装createAlink方法
+
+  ```js
+  function creatAlink(fileUrl, fileName) {
+    const anchor = document.createElement('a')
+    anchor.href = fileUrl
+    anchor.setAttribute('download', fileName)
+    anchor.innerHTML = 'downloading...'
+    anchor.style.display = 'none'
+    document.body.appendChild(anchor)
+    setTimeout(() => {
+      anchor.click()
+      document.body.removeChild(anchor)
+      setTimeout(() => {
+        self.URL.revokeObjectURL(anchor.href)
+      }, 250)
+    }, 66)
+  }
+  ```
+
+  
