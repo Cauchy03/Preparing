@@ -910,4 +910,33 @@ Object.seal()方法封闭一个对象，阻止添加新属性并将所有现有�
   }
   ```
 
+  revokeObjectURL
+  
+  ## 点击复制文本
+  
+  Clipboard 点击复制
+  
+  ```
+  npm install --save clipboard
+  ```
+  
+  ```js
+  clipboard() {
+      const clipboard = new Clipboard('.copy-qb', {
+          text: () => {
+              return this.taskNum
+          }
+      })
+      clipboard.on('success', e => {
+          this.$message.success('复制成功！')
+          // 清除选中
+          e.clearSelection()
+          clipboard.destroy()
+      })
+      clipboard.on('error', () => {
+          this.$message.error('复制失败,请手动复制！')
+          clipboard.destroy()
+      })
+  }
+  ```
   
