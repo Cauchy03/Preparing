@@ -939,4 +939,49 @@ Object.seal()方法封闭一个对象，阻止添加新属性并将所有现有�
       })
   }
   ```
-  
+
+el-autocomplete 输入文字请求没有数据时下拉会闪动
+
+```
+<el-autocomplete
+    v-model="form.custName"
+    :fetch-suggestions="querySearchAsync"  输入文字请求数据的回调
+    placeholder="请输入内容"
+    @select="handleSelect"                  选择下拉的回调
+    :popper-append-to-body="false"          讲下拉元素添加到body中
+    :debounce="0"							延时防抖
+    popper-class="custClass"/>				下拉的类名，后续获取节点
+```
+
+```js
+querySearchAsync(queryString, cb) {
+    this.custList = []
+    const params = {
+        keyword: this.form.custName
+    }
+    // 获取下拉元素
+    let oop = document.querySelector('.custClass')
+    if (queryString) {
+        getGroupList(params).then((res) => {
+            res.data.forEach((item) => {
+                this.custList.push({
+                    value: item.custName,
+                    dictValue: item.custCode
+                })
+            })
+            this.custList.length > 0 ? oop.style.display = "block" : ""
+            cb(this.custList)
+        })
+    } else {
+        this.custList = []
+        cb(this.custList)
+    }
+},
+```
+
+```scss
+::v-deep .el-autocomplete-suggestion {
+    display:none;
+}
+```
+
