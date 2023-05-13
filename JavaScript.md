@@ -985,3 +985,4 @@ querySearchAsync(queryString, cb) {
 }
 ```
 
+el table 列宽自适应
