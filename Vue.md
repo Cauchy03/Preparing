@@ -154,6 +154,107 @@ v-model是一个语法糖，他可以用在表单元素上，也可用在组件�
 //在:value中,sth => value;
 ```
 
+#### vue2/3 V-model使用
+
+##### vue2
+
+v-model 只是 value + change 的语法糖，监听输入并触发改变，因此只要实现 “监听” + “触发” 就可以自定义 v-model
+
+```vue
+<ChildComponent  v-model="pageTitle" />
+<!-- 简写: -->
+<ChildComponent  :value="pageTitle" @input="pageTitle = $event" />
+```
+
+```vue
+<!-- 子组件: -->
+<template>
+  <input @input="handleChange"/>
+</template>
+
+<script>
+export default {
+  // 通过model可以自定义属性和事件名
+  model: {
+    event: 'change',
+    prop: 'title'
+  },
+  props: {
+    title: {
+      type: String,
+    }
+  },
+  methods: {
+    handleChange () {
+      // 对外暴露一个change事件
+      this.$emit('change', !this.checked)
+    }
+  }
+}
+</script>
+```
+
+使用v-model实现双向绑定。但有时候我们希望一个组件可以实现多个数据的“双向绑定”，而`v-model`一个组件只能有一个(Vue3.0可以有多个)，这时候就需要使用到`.sync`
+
+```vue
+<ChildComponent :title.sync="pageTitle" />
+<!-- 简写: -->
+<ChildComponent :title="pageTitle" @update:title="pageTitle = $event" />
+```
+
+```js
+// 必须使用update:title事件名
+this.$emit('update:title', newValue)
+```
+
+.sync与v-model的异同
+
+相同点:
+
+1. 两者的本质都是语法糖，目的都是实现组件与外部数据的双向绑定
+2. 两个都是通过属性+事件来实现的
+
+不同点:
+
+1. 一个组件只能定义一个v-model,但可以定义多个.sync
+2. v-model与.sync对于的事件名称不同，v-model默认事件为input,可以通过配置model来修改，.sync事件名称固定为update:属性名
+
+##### vue3
+
+vue3移除了.sync修饰符，将两者进行合并  形式 v-model:modelValue = 自定义数据
+
+子组件接收props.modelValue  和 update:modelValue自定义事件
+
+```vue
+<ChildComponent v-model="pageTitle" />
+<!-- 是以下的简写: -->
+<ChildComponent
+  :modelValue="pageTitle"
+  @update:modelValue="pageTitle = $event"/>
+```
+
+更改事件名，可多个v-model数据双向绑定
+
+```vue
+<ChildComponent v-model:title="pageTitle" />
+<!-- 是以下的简写: -->
+<ChildComponent :title="pageTitle" @update:title="pageTitle = $event" />
+```
+
+```vue
+<!-- 子组件接收: -->
+<script setup lang="ts">
+//接受props
+let props = defineProps(["title"]);
+let emit = defineEmits(['update:title']);
+//子组件内部按钮的点击回调
+const handler = () => {
+  //触发自定义事件
+  emit('update:title', props.title + 1000);
+}
+</script>
+```
+
 ## 9. vue $nextTick实现原理
 
 ```
