@@ -1014,3 +1014,23 @@ a<<b
 填充的符号位为0
 ```
 
+## 构造函数的return
+
+JS中构造函数可以有返回值也可以没有返回值
+
+1. 没有返回值则是undefined
+2. 返回值是基本数据类型，则返回实例化对象
+3. 返回值是引用数据类型，则实际返回引用类型对象
+
+```js
+function  Func(name,age) {
+    this.name = name
+    this.age = age
+    return {
+        a: 1
+    }
+}
+console.log(Func())  // {a:1}
+console.log(new Func('tom',18)) //{a:1}
+```
+
