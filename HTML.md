@@ -265,7 +265,7 @@ HTML5 提供了两种在客户端存储数据的新方法：
 - 纯表现的元素：basefont，big，center，font, s，strike，tt，u;
 - 对可用性产生负面影响的元素：frame，frameset，noframes；
 
-### 7. img 的 srcset 属性的作⽤？
+### 7. img 的 srcset 属性的作用？
 
 响应式页面中经常用到根据屏幕密度设置不同的图片。这时就用到了 img 标签的 srcset 属性。srcset 属性用于设置不同屏幕密度下，img 会自动加载不同的图片。用法如下：
 
@@ -527,7 +527,7 @@ HTML文档结构一般包括标记（Html）、头部（Head）、主体（Body�
 4. **style属性**：用于指定元素的样式，如字体、颜色、大小等。
 5. **data属性**：用于为元素存储额外的数据，常用于JavaScript中操作元素。
 
-## HTML标签有哪些组成
+### HTML标签有哪些组成
 
 ```
 标签名、属性、内容、开始标记和结束标记

@@ -172,6 +172,7 @@ p:first-child {color: red}
 
 - **解决 margin 的重叠问题**：由于 `BFC`是一个独立的区域，内部的元素和外部的元素互不影响，将两个元素变为两个 `BFC`，就解决了 margin 重叠的问题。
 - **解决高度塌陷的问题**：在对子元素设置浮动后，父元素会发生高度塌陷，也就是父元素的高度变为 0。解决这个问题，只需要把父元素变成一个 `BFC`。常用的办法是给父元素设置`overflow:hidden`。
+- **阻止元素被浮动元素覆盖**
 - **创建自适应两栏布局**：可以用来创建自适应两栏布局：左边的宽度固定，右边的宽度自适应。
 
 ```css
@@ -199,11 +200,12 @@ position 有以下属性值：
 
 | 属性值   | 概述                                                         |
 | -------- | ------------------------------------------------------------ |
-| absolute | 生成绝对定位的元素，相对于 static 定位以外的一个父元素进行定位。元素的位置通过 left、top、right、bottom 属性进行规定。 |
+| absolute | 元素会被移出正常文档流，生成绝对定位的元素，相对于 static 定位以外的一个父元素进行定位。元素的位置通过 left、top、right、bottom 属性进行规定。 |
 | relative | 生成相对定位的元素，相对于其原来的位置进行定位。元素的位置通过 left、top、right、bottom 属性进行规定。 |
-| fixed    | 生成绝对定位的元素，指定元素相对于屏幕视⼝（viewport）的位置来指定元素位置。元素的位置在屏幕滚动时不会改变，⽐如回到顶部的按钮⼀般都是⽤此定位⽅式。 |
+| fixed    | 元素会被移出正常文档流，生成绝对定位的元素，指定元素相对于屏幕视⼝（viewport）的位置来指定元素位置。元素的位置在屏幕滚动时不会改变，⽐如回到顶部的按钮⼀般都是⽤此定位⽅式。 |
 | static   | 默认值，没有定位，元素出现在正常的文档流中，会忽略 top, bottom, left, right 或者 z-index 声明，块级元素从上往下纵向排布，⾏级元素从左向右排列。 |
 | inherit  | 规定从父元素继承 position 属性的值                           |
+| sticky   | 元素根据正常文档流进行定位，粘性定位，动态固定               |
 
 前面三者的定位方式如下：
 
@@ -260,8 +262,14 @@ flex-grow:1   flex-shrink:1    flex-basis:0%
 ```
 
 - flex-grow 属性定义项目的放大比例，默认为 0，即如果存在剩余空间，也不放大。
+
 - flex-shrink 属性定义了项目的缩小比例，默认为 1，即如果空间不足，该项目将缩小。
+
 - flex-basis 属性指定了 flex 元素在主轴方向上的初始大小。浏览器根据这个属性，计算主轴是否有多余空间。它的默认值为 auto，即项目的本来大小。
+
+  优先级：max-width/min-width > flex-basis > width > box
+
+  flex-basis的优先级高于width，且在父元素容器不足时会进行调整
 
 ## 11. `css`三角形和省略号 
 
@@ -456,7 +464,7 @@ display:-webkit-box;         // 作为弹性伸缩盒子模型显示
 - **采用 transform: scale()的方式**，该方法用来定义元素的 2D 缩放转换：
 
 ```css
-transform: scale(0.5,0.5);
+transform: scaleY(0.5);
 ```
 
 - **采用 meta viewport 的方式**
@@ -536,6 +544,7 @@ transform-origin: left top
 
 ```css
 .parent {
+    height: 100vh; /* 设置高度 避免align-items失效 */
     display: flex;
     justify-content:center;
     align-items:center;
