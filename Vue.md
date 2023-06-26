@@ -709,7 +709,7 @@ computed属性是计算属性，它是根据其它属性的值计算得出的一
 
 ##  样式穿透 ::v-deep
 
-### Vue3自定义Hooks和Vue2时代Mixin的关系
+## Vue3自定义Hooks和Vue2时代Mixin的关系
 
 
 ```
