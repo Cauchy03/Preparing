@@ -308,7 +308,7 @@ mixin通常来讲就是混入，本质是一个对象，当多个组件或页面
 ![image.png](https://cdn.nlark.com/yuque/0/2022/png/29414776/1658110268214-b9a20581-ae3b-4cee-b55d-d4777b0393c8.png?x-oss-process=image%2Fresize%2Cw_926%2Climit_0)
 
 ```
-就像刚才提到的数据监听机制的改变，通过Proxy代理替代Object.defineProperty进行响应式。然后就是这个composition API替代了V2的一个配置式API，composition API在这个Vue3.0和3.2在呈现上有一点不同，比如最初composition API以setup函数作为入口，也必须返回两种数据类型的值，一种是对象另一种是函数，当返回一个对象时，对象中的属性和方法可以在template中直接进行使用，返回一个函数的时候，这个函数会作为一个render函数，但是这种setup函数逻辑就会导致这个函数特别臃肿，所以在vue3.2中出现了script setup的一个语法糖尝试去解决这个问题。然后就是v3性能的一些优化，比如tree-shaking的优化减小打包的体积，diff的优化利用patchflag对需要更新的节点打上标记，就不需要新旧对象数的一个比较。v3还提供一些内置组件比如，Suspense异步组件，Telport组件，更好的支持TypeScript
+就像刚才提到的数据监听机制的改变，通过Proxy代理替代Object.defineProperty进行响应式。然后就是这个composition API替代了V2的一个配置式API，composition API在这个Vue3.0和3.2在呈现上有一点不同，比如最初composition API以setup函数作为入口，也必须返回两种数据类型的值，一种是对象另一种是函数，当返回一个对象时，对象中的属性和方法可以在template中直接进行使用，返回一个函数的时候，这个函数会作为一个render函数，但是这种setup函数逻辑就会导致这个函数特别臃肿，所以在vue3.2中出现了script setup的一个语法糖尝试去解决这个问题。然后就是v3性能的一些优化，比如tree-shaking的优化减小打包的体积，diff的优化利用patchflag对需要更新的节点打上标记，就不需要新旧对象树的一个比较。v3还提供一些内置组件比如，Suspense异步组件，Telport组件，更好的支持TypeScript
 ```
 
 ## 6. 讲一下Proxy对象
