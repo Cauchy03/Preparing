@@ -75,6 +75,7 @@ interface k {                  //定义了一个接口 k
     a2: string,
     a3?: boolean,
     readonly a4?: number,
+    [propName: string]: any  // 剩下的属性不做限制 常用于后端返回的数据只判断所需属性
 }
 
 const k1: k = {               //接着定义了一个变量 k1，它的类型是 k
@@ -212,4 +213,47 @@ function identity<T>(arg: T): T {
 
 ## any 和 unknown 的区别
 
-any 和 unknown 都代表任意类型，但是 unknown 只能接收任意类型的值，而 any 除了可以接收任意类型的值，也可以赋值给任意类型（除了 never）。类型体操中经常用 unknown 接受和匹配任何类型，而很少把任何类型赋值给某个类型变量。
+any 和 unknown 都代表任意类型，但是 unknown 只能接收任意类型的值（赋值给any或者本身），而 any 除了可以接收任意类型的值，也可以赋值给任意类型（除了 never）。
+
+unknown不能读取任何属性，方法也不可调用。unknown比any更加安全
+
+### Object object {}
+
+在原型链中，所有的基本数据类型和引用数据类型都指向大Object，用Object类型相当于包含所有类型（{} = new Object 所以效果相同)
+
+object类型只包含引用数据类型
+
+```ts
+let obj1: Object = 123 / '123' / bool ✔ 
+let obj2: Object = () => {} ✔
+
+let obj3: object = 123 / '123' / bool ×
+let obj4: object = [] / {} / () => {} ✔
+```
+
+### abstract 抽象类
+
+```ts
+// 抽象类
+// abstract 定义抽象类
+// abstract 所定义的方法 都只能描述 不能进行实现
+
+// 抽象类无法被实例化  可以通过派生类继承抽象类
+
+abstract class Vue1 {
+    name:string
+    constructor(name: string) {
+    }
+    abstract init(name: string): void
+}
+
+class Vue2 extends Vue1 {
+    init() {
+        ...
+    }
+}
+```
+
+### 装饰器
+
+装饰器就是一个可以提前拿到类本身（或原型对象）并预处理的函数，当类定义的时候被调用。
