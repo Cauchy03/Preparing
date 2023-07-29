@@ -681,7 +681,27 @@ console.log(numberepsilon(0.1 + 0.2, 0.3)); // true
 
 `requestAnimationFrame` **函数用于动画的帧动画**。它告诉浏览器您需要在下一个动画帧中更新动画，以获得最流畅的帧速率。**它接受一个回调函数，该回调函数将在下一个动画帧时被调用，您可以在其中更新动画**。
 
-`requestIdleCallback` **函数用于在浏览器空闲时执行任务**。它告诉浏览器您需要在浏览器空闲时执行任务，而不是在浏览器忙碌时。它接受一个回调函数，该回调函数将在浏览器空闲时被调用，您可以在其中执行不优先级很高的任务，例如**数据分析**等。
+`requestIdleCallback` **函数用于在浏览器空闲时执行任务**。它告诉浏览器您需要在浏览器空闲时执行任务，而不是在浏览器忙碌时。它接受一个回调函数，该回调函数将在浏览器空闲时被调用，您可以在其中执行不优先级很高的任务，例如**数据分析**等。该回调函数会传递一个`deadline`参数，能够知道当前帧的剩余时间
+
+```ts
+interface Dealine {
+    didTimeout: boolean // 表示任务执行是否超过约定时间
+    timeRemaining(): DOMHighResTimeStamp // 任务可供执行的剩余时间
+}
+
+requestIdelCallback(myNonEssentialWork)
+
+function myNonEssentialWork (deadline: Dealine) {
+    // deadline.timeRemaining()可以获取到当前帧剩余时间
+    // 当前帧还有时间 并且任务队列不为空
+    while (deadline.timeRemaining() > 0 && tasks.length > 0) {
+        doWorkIfNeeded()
+    }
+    if (tasks.length > 0){
+        requestIdleCallback(myNonEssentialWork)
+    }
+}
+```
 
 总的来说，如果您需要动画效果，可以使用 `requestAnimationFrame`；如果您需要在浏览器空闲时执行任务，则可以使用 `requestIdleCallback`。
 
@@ -884,9 +904,15 @@ Object.seal()方法封闭一个对象，阻止添加新属性并将所有现有�
 
 ## JS为什么是单线程
 
+> Javascript脚本是单线程的，通俗一点就是可以叫做“窗体线程”
+>
 > js作为浏览器的脚本语言，主要是实现用户与浏览器的交互，以及操作dom；如果js被设计为了多线程，一个线程修改dom元素，另一个线程要删除dom元素，浏览器就会一脸茫然，不知所措
 >
 > 为了利用多核CPU计算能力，HTML5提出web worker标准，允许js脚本创建多个线程，但是子线程完全受主线程控制，且不得操作dom
+
+## window和self
+
+> Web Worker与Service Worker其实本质上是开启了另外的线程，而我们的Workers开启的新线程并没有所谓”窗体“这个概念，所以在webwork 中使用self
 
 ## 为什么要有异步操作
 
@@ -1058,3 +1084,4 @@ console.log(new Func('tom',18)) //{a:1}
 
 ## Blob
 
+## ArrayBuffer
