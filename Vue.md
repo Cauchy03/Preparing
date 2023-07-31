@@ -715,7 +715,27 @@ computed属性是计算属性，它是根据其它属性的值计算得出的一
 ```
 Mixin不足
 在 Vue 2 中，mixin 是将部分组件逻辑抽象成可重用块的主要工具。但是，他们有几个问题：
-1、Mixin 很容易发生冲突：因为每个 mixin 的 property 都被合并到同一个组件中，所以为了避免 property 名冲突，你仍然需要了解其他每个特性。
-2、可重用性是有限的：我们不能向 mixin 传递任何参数来改变它的逻辑，这降低了它们在抽象逻辑方面的灵活性。
+1、Mixin 很容易发生冲突：因为每个 mixin 的 property 都被合并到同一个组件中，Mixin不明的混淆，我们根本无法获知属性来自于哪个Mixin文件，给后期维护带来困难
+2、可重用性是有限的：我们不能向 mixin 传递任何参数来改变它的逻辑，降低了它们在抽象逻辑方面的灵活性。
+3、Mixin同名变量会被覆盖，Vue3自定义Hook可以在引入的时候对同名变量重命名
 ```
 
+## watch和watchEffect
+
+> watch既要指明监视属性，也要指明监视的回调
+>
+> watchEffect不用指明监视属性，用到哪个属性就监视哪个属性
+>
+> watchEffect有点像computed：
+>
+> - 但computed注重计算出来的结果，必须要写返回值
+> - 而watchEffect注重过程，不用写返回值
+>
+> ```js
+> //watchEffect所指定的回调中用到的数据只要发生变化，则直接重新执行回调。
+> watchEffect(()=>{
+>     const x1 = sum.value
+>     const x2 = person.age
+>     console.log('watchEffect配置的回调执行了')
+> })
+> ```
