@@ -705,6 +705,26 @@ function myNonEssentialWork (deadline: Dealine) {
 
 总的来说，如果您需要动画效果，可以使用 `requestAnimationFrame`；如果您需要在浏览器空闲时执行任务，则可以使用 `requestIdleCallback`。
 
+## requestAnimationFrame和setTimeout/setInterval
+
+> requestAnimationFrame是专门为动画提供的API，间隔时间是由浏览器自身决定的，大约是`17毫秒`左右。它的刷新频率与显示器的频率保持一致，可以解决用 setTimeout/setInterval 制作动画卡顿的情况
+>
+> setTimeout/setInterval属于宏任务，其他任务会阻塞或延迟js任务的执行，导致定时器不准的情况；还有就是刷新频率受屏幕分辨率和屏幕尺寸的影响，因此不同设备的屏幕刷新频率可能会不同，而 `setTimeout` 只能设置一个固定的时间间隔，这个时间不一定和屏幕的刷新时间相同
+>
+> 1）引擎层面
+>
+> setTimeout/setInterval 属于 `JS引擎`，requestAnimationFrame 属于 `GUI引擎`
+>
+> `JS引擎与GUI引擎`是互斥的，也就是说 GUI 引擎在渲染时会阻塞 JS 引擎的计算
+>
+> 2）性能层面
+>
+> 当页面被隐藏或最小化时，setTimeout/setInterval 定时器仍会在后台执行动画任务，而使用 requestAnimationFrame 当页面处于未激活的状态下，屏幕刷新任务会被系统暂停
+
+> 高频率事件(`resize`、`scroll` 等的过程其实就是浏览器自身的帧渲染，也就是说对应的事件在一个刷新间隔中只会执行一次，而就算使用了请求动画帧也是同样的效果。这样一来，使用 `requestAnimationFrame` 其实并没有起到优化的效果，并不适合做节流，还是更加适合在动画设计中使用
+
+
+
 ## 事件流
 
 > 事件流：事件在发生时会在目标节点和根节点之间按照特定的顺序，进行传播，传播所经过路径上所有节点都会接收到这个事件，这个过程就叫事件流。
