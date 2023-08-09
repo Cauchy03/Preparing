@@ -1102,8 +1102,146 @@ console.log(Func())  // {a:1}
 console.log(new Func('tom',18)) //{a:1}
 ```
 
-## Blob
+## JS二进制
 
-## ArrayBuffer
+### Blob
 
-## FileReader
+[谈谈JS二进制：File、Blob、FileReader、ArrayBuffer、Base64 - 掘金 (juejin.cn)](https://juejin.cn/post/7148254347401363463?searchId=202308091244476E8C0AE158472F3275BA)
+
+![img](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/aa83846a988842ad8656a68331207bef~tplv-k3u1fbpfcp-zoom-in-crop-mark:4536:0:0:0.awebp)
+
+二进制数据大对象，表示了一个不可变、原始数据的块，可以是任意类型的数据，例如文本、图像、音频等
+
+```js
+const data = 'Hello, world!'
+const blob = new Blob([data], { type: 'text/plain' })
+```
+
+### File
+
+File 对象是 Blob对象的一种特殊形式，继承于Blob，额外包含了文件相关的属性，如 name（文件名）、size（文件大小）、lastModified（最后修改时间）等。File对象通常由用户通过文件输入框或拖放操作选择文件时创建
+
+```js
+const fileInput = document.getElementById('fileInput')
+const file = fileInput.files[0]
+```
+
+Blob对象可以通过构造函数 Blob()创建，而File对象一般是由用户在界面上选择文件或拖放操作创建的
+
+### ArrayBuffer
+
+ArrayBuffer 对象用来表示通用的、固定长度的**原始二进制数据缓冲区**。ArrayBuffer 的内容不能直接操作，只能通过 DataView 对象或 TypedArrray 对象来访问。这些对象用于读取和写入缓冲区内容
+
+可以通过ArrayBuffer生成Blob对象
+
+```js
+// 参数：它接受一个参数，即 bytelength，表示要创建数组缓冲区的大小（以字节为单位）
+// 返回值：返回一个新的指定大小的ArrayBuffer对象，内容初始化为0。
+new ArrayBuffer(bytelength)
+```
+
+### FileReader
+
+FileReader 是一个异步 API，用于读取文件并提取其内容以供进一步使用。FileReader 可以将 Blob 读取为不同的格式。
+
+注意：FileReader 仅用于以安全的方式从用户（远程）系统读取文件内容，不能用于从文件系统中按路径名简单地读取文件。
+
+```js
+// FileReader 用于异步读取文件内容，并将文件内容以文本或二进制数据的形式返回
+const reader = new FileReader()
+reader.readAsArrayBuffer(fileChunkList[index].file)
+// readAsArrayBuffer() 读取指定的 Blob中的内容，result 属性中保存的将是被读取文件的 ArrayBuffer 数据对象。
+// readAsText() result属性中将包含一个字符串以表示所读取的文件内容。
+```
+
+### Base64
+
+Base64 是一种基于64个可打印字符来表示二进制数据的表示方法
+
+- `atob()`：解码，解码一个 Base64 字符串；
+- `btoa()`：编码，从一个字符串或者二进制数据编码一个 Base64 字符串
+
+```js
+atob('SmF2YVNjcmlwdA==') // 'JavaScript'
+btoa("JavaScript")       // 'SmF2YVNjcmlwdA=='
+```
+
+使用`toDataURL()`方法把 canvas 画布内容生成 base64 编码格式的图片：
+
+```js
+const canvas = document.getElementById('canvas')
+const ctx = canvas.getContext("2d")
+const dataUrl = canvas.toDataURL()
+```
+
+### 格式转化
+
+1. ArrayBuffer → blob
+
+   ```js
+   const blob = new Blob([new Uint8Array(buffer, byteOffset, length)])
+   ```
+
+2. ArrayBuffer → base64
+
+   ```js
+   const base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(arrayBuffer)))
+   ```
+
+3. base64 → blob
+
+   ```js
+   const base64toBlob = (base64Data, contentType, sliceSize) => {
+       const byteCharacters = atob(base64Data)
+       const byteArrays = []
+   
+       for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+           const slice = byteCharacters.slice(offset, offset + sliceSize)
+   
+           const byteNumbers = new Array(slice.length);
+           for (let i = 0; i < slice.length; i++) {
+               byteNumbers[i] = slice.charCodeAt(i)
+           }
+   
+           const byteArray = new Uint8Array(byteNumbers);
+           byteArrays.push(byteArray)
+       }
+   
+       const blob = new Blob(byteArrays, {type: contentType});
+       return blob
+   }
+   ```
+
+4. blob → ArrayBuffer
+
+   ```js
+   function blobToArrayBuffer(blob) { 
+       return new Promise((resolve, reject) => {
+           const reader = new FileReader()
+           reader.onload = () => resolve(reader.result)
+           reader.onerror = () => reject
+           reader.readAsArrayBuffer(blob)
+       })
+   }
+   ```
+
+5. blob → base64
+
+   ```js
+   function blobToBase64(blob) {
+       return new Promise((resolve) => {
+           const reader = new FileReader()
+           reader.onloadend = () => resolve(reader.result)
+           reader.readAsDataURL(blob)
+       })
+   }
+   ```
+
+6. blob → Object URL
+
+   ```js
+   const objectUrl = URL.createObjectURL(blob)
+   ```
+
+   
+
