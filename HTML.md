@@ -1,5 +1,3 @@
-![HTML面试题.png](https://cdn.nlark.com/yuque/0/2021/png/1500604/1621600195788-acab59b1-a654-4ec4-b9c2-0a491a660671.png)
-
 ### 1. src 和 href 的区别
 
 > src和href都是来引入外部资源
@@ -539,3 +537,6 @@ HTML文档结构一般包括标记（Html）、头部（Head）、主体（Body�
 dataset是H5新增的属性，在标签元素中设置data-自定义名称的形式，设置自定义属性，通过dataset.自定义名称的形式获取
 dataset属性返回一个DOMStringMap对象，该对象包含所有自定义属性，主要是方便数据管理和存放
 ```
+
+### canvas
+
