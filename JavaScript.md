@@ -1,15 +1,13 @@
-## 解释一下原型链
+## 原型 原型链
 
-> 在js中是使用构造函数创建一个对象，每一个构造函数内部都有一个prototype属性，这个属性是一个对象包含了该构造函数所有实例公享的属性和方法，也被称为原型对象。当使用构造函数新建一个对象后，在这个对象的内部包含一个指针，指向构造函数的prototype属性对应的值，也就是通过__proto__属性访问原型对象。
+> 在js中是使用构造函数创建一个对象，每一个构造函数内部都有一个prototype属性，这个属性是一个对象包含了该构造函数所有实例公享的属性和方法，也被称为原型对象。当使用构造函数新建一个对象后，在这个对象的内部包含一个指针，指向构造函数的prototype属性对应的值，也就是通过__proto__属性访问原型对象
 > 当访问一个对象的属性，如果这个对象内部不存在这个属性，那么它就会去它的原型对象里找这个属性，这个原型也会有自己的原型，于是就这么一直找下去，直到大Object，这就是原型链的概念
 
 ![](https://static.vue-js.com/6a742160-725e-11eb-ab90-d9ae814b240d.png)
 
 ## 原型的作用
 
-```
-实现面向对象。支持面向对象的语言必须要做到能判定一个实例的类型。在JS中，可以通过原型判定某个对象属于哪个类型，避免了类型的丢失
-```
+> 实现面向对象。支持面向对象的语言必须要做到能判定一个实例的类型。在JS中，可以通过原型判定某个对象属于哪个类型，避免了类型的丢失
 
 ## 具体原型链判断
 
@@ -184,6 +182,12 @@ for (let i = 1; i <= 5; i++) {
   }, i * 1000)
 }
 ```
+
+## null和undefined的区别
+
+> null表示"没有对象"，即该处不应该有值，需要释放一个对象时，直接赋值为 null 即可，例如闭包
+>
+> undefined表示"缺少值"，就是此处应该有一个值，但是还没有定义
 
 ## 谈谈你对作用域的理解
 
@@ -386,7 +390,7 @@ fun1.bind({id: 'Obj'})();   // 'Global'
 
 [Symbol类型有什么用？怎么用？ - 掘金 (juejin.cn)](https://juejin.cn/post/7021148449961672735)
 
-## js脚本异步加载如何实现 有什么区别
+## js脚本异步加载如何实
 
 > 在script标签中设置defer和async属性，可以让脚本与文档同步解析，在文档解析完成后再执行脚本，defer可以保证脚本的执行顺序而async不能保证；还可以通过动态创建的方式，也就是监听文档加载事件，等到加载完再引入；还可以将js脚本放到文档的底部，最后执行；设置定时器延迟加载脚本
 
@@ -459,11 +463,9 @@ document.addEventListener("beforeunload", alert('确认离开?'));
 
 ## `typeof `和`instanceof`区别
 
-> 主要包括三个事件DOMContentLoaded、onload、beforeUnload和unload，DOMContentLoaded时，已加载完HTML数据生成了DOM树，但是一些样式、图片之类的外部文件仍未加载，可以进行一些初始化接口 ；onload时，加载完所有的文件资源；beforeUnload时，用户准备离开，可以进行一些确认保存数据的操作，unload用户离开时，可以做一些不涉及延迟的操作，比如关闭相关弹出窗口
-
 `typeof` 操作符返回一个字符串，表示未经计算的操作数的类型,用于检测数据类型
 
-`instanceof` 运算符用于检测构造函数的 `prototype` 属性是否出现在某个实例对象的原型链上、
+`instanceof` 运算符用于检测构造函数的 `prototype` 属性是否出现在某个实例对象的原型链上
 
 区别：
 
@@ -478,9 +480,42 @@ document.addEventListener("beforeunload", alert('确认离开?'));
 > for in是对可枚举属性获取键名
 > for of是对可迭代对象获取键值
 > 可枚举属性就是属性的enumerable的值为true
-> 可迭代对象有Array、Set、Map、String，一个可迭代对象必须实现了iterator这方法并且还需要一个next，，在迭代器内部会不断调用next直到返回done这个属性为true
+> 可迭代对象有Array、Set、Map、String，一个可迭代对象必须实现了iterator这方法并且还需要返回一个对象包含next方法，在迭代器内部会不断调用next直到返回done这个属性为true
 >
 > for of不能遍历对象{}
+>
+> ```js
+> // 新建一个对象
+> let Iter = {
+>     name: 'zhangsan',
+>     age: [1, 2, 3, 4, 5, 6]
+> }
+> // 编写[Symbol.iterator]内置函数
+> Iter[Symbol.iterator] = function () {
+>     // 设置索引值
+>     let index = 0
+>     // 保存this指向
+>     let _this = this
+>     return {
+>         // 返回一个next函数
+>         // next 函数有返回一个含value和done属性的对象
+>         next: function () {
+>             if (index < _this.age.length) {
+>                 let result = { value: _this.age[index], done: false }
+>                 index++
+>                 return result
+>             } else {
+>                 return { value: undefined, done: true }
+>             }
+>         }
+>     }
+> }
+> 
+> // 这里调用[Symbol.iterator]内置函数
+> for (const iterator of Iter) {
+>     console.log(iterator);
+> }
+> ```
 
 ## map和forEach可以通过break跳出吗
 
@@ -527,19 +562,19 @@ obj instanceof Array
 - 通过原型链做判断
 
 ```js
-obj.__proto__ === Array.prototype;
+obj.__proto__ === Array.prototype
 ```
 
 - 通过`ES6`的`Array.isArray()`做判断
 
 ```js
-Array.isArray(obj);
+Array.isArray(obj)
 ```
 
 - 通过`Object.prototype.toString.call()`做判断
 
 ```js
-Object.prototype.toString.call(obj).slice(1) === 'Array';
+Object.prototype.toString.call(obj).slice(8, -1) === 'Array'
 ```
 
 - 通过`Object.getprototypeOf()`做判断
@@ -579,35 +614,35 @@ sort方法接受一个“比较函数”作为参数。
 
 ## 如何拷贝一个对象
 
-> 浅拷贝：解构赋值、Object.assign()、Array.prototype.slice
-> 深拷贝：JSON.parse(JSON.stringify())
+> 浅拷贝：扩展运算符、Object.assign()、Array.prototype.slice
+> 深拷贝：JSON.parse(JSON.stringify())、lodash、递归
 > 浅拷贝只是复制一个指针，不是复制本身，还是共享同一内存相当于分支
 > 深拷贝重新开辟一个内存，复制一个一模一样的对象，修改新对象不会改变原对象，相当于引用
 
 - `Object.assign()`：这是一个浅拷贝方法，可以将一个或多个源对象的所有可枚举属性复制到目标对象中。
 
 ```js
-javascriptCopy codeconst original = { a: 1, b: 2 };
+let original = { a: 1, b: 2 };
 const copy = Object.assign({}, original);
 ```
 
 - 解构赋值：这也是一种浅拷贝方法，它可以将源对象的所有属性复制到目标对象中。
 
 ```js
-goCopy codeconst original = { a: 1, b: 2 };
+let original = { a: 1, b: 2 };
 const copy = { ...original };
 ```
 
 - `JSON` 序列化/反序列化：这是一种深拷贝方法，可以将对象转换为 `JSON `字符串，再将字符串转换回对象。
 
 ```js
-javascriptCopy codeconst original = { a: 1, b: 2 };
+let original = { a: 1, b: 2 };
 const copy = JSON.parse(JSON.stringify(original));
 ```
 
 深拷贝和浅拷贝的区别：
 
-浅拷贝只复制指向某个对象的指针，而不复制对象本身，新旧对象还是共享同一块内存（“分支”）
+浅拷贝只复制指向某个对象的指针，而不复制对象本身，新旧对象还是共享同一块内存（“分支”）,浅拷贝只会拷贝第一层数据，如果包含嵌套对象会数组，则存在修改原对象或拷贝对象的嵌套
 
 深拷贝会另外创造一个一模一样的对象，新对象跟原对象不共享内存，修改新对象不会改到原对象，是“值”而不是（“引用”）
 
@@ -663,7 +698,7 @@ console.log(numberepsilon(0.1 + 0.2, 0.3)); // true
 
 > ==会将两边数据类型转化为相同的数据类型再进行比较
 >
-> ===不会做强制类型转换，如果数据类型或者值不同直接返回falese
+> ===不会做强制类型转换，如果数据类型或者值不同直接返回flase
 >
 > Object.is()基本与===相同，处理了一些特殊情况比如0和-0，两个NaN是相等的
 
@@ -723,11 +758,9 @@ function myNonEssentialWork (deadline: Dealine) {
 
 > 高频率事件(`resize`、`scroll` 等的过程其实就是浏览器自身的帧渲染，也就是说对应的事件在一个刷新间隔中只会执行一次，而就算使用了请求动画帧也是同样的效果。这样一来，使用 `requestAnimationFrame` 其实并没有起到优化的效果，并不适合做节流，还是更加适合在动画设计中使用
 
-
-
 ## 事件流
 
-> 事件流：事件在发生时会在目标节点和根节点之间按照特定的顺序，进行传播，传播所经过路径上所有节点都会接收到这个事件，这个过程就叫事件流。
+> 事件流：事件在发生时会在目标节点和根节点之间按照特定的顺序，进行传播，传播所经过路径上所有节点都会接收到这个事件，这个过程就叫事件流
 > 事件流又有两个模型事件冒泡和事件捕获
 > 三个阶段：冒泡阶段、目标阶段、捕获阶段
 > 事件冒泡：当目标节点被触发，会由内向外div-body-html-document依次触发祖先节点同类型事件，直到DOM根节点
@@ -746,46 +779,15 @@ function myNonEssentialWork (deadline: Dealine) {
 >
 > 微任务：Promise、MutationObserver、async/await、process.nextTick(Node 环境)
 
-## *node事件循环与浏览器的哪些不一样
-
-> node独有的异步形式：
->
-> - I/O操作：异步加载本地文件
-> - setImmediate()：与 setTimeout 设置 0ms 类似，在某些同步任务完成后立马执行
-> - process.nextTick()：在某些同步任务完成后立马执行
-
-首先，Node.js 是基于服务器的 JavaScript 环境，因此它不需要像浏览器那样处理复杂的 DOM 操作和渲染。它具有更快的 I/O 性能和更大的线程池，从而更好地支持高性能网络服务器。
-
-另外，Node.js 中的事件循环是单线程的，而浏览器中的 JavaScript 则是多线程的。在 Node.js 中，所有的同步任务在主线程上完成，异步任务则由 libuv 库的线程池处理。这种单线程的架构让 Node.js 开发者不用考虑多线程环境下的线程同步问题
-
-## *node require具体实现是什么
-
-1. 先查找缓存：Node.js 会缓存已经加载过的模块，如果缓存中有该模块，则直接返回缓存中的模块。
-2. 解析文件路径：如果没有在缓存中找到该模块，Node.js 会尝试解析文件路径。如果是以 `./` 或者 `/` 开头的路径，则认为是相对路径；否则认为是内置模块或者安装的第三方模块。
-3. 加载文件：如果文件路径解析成功，Node.js 会读取该文件，并在文件的末尾自动加上一个包装函数。这个函数的作用是在该模块的作用域中执行文件代码。
-4. 执行代码：Node.js 会执行文件的包装函数，并返回模块的导出对象。
-5. 缓存模块：最后，Node.js 会缓存该模块，以便下次加载更快。
-
-通过这些步骤，我们就可以在 Node.js 中方便地使用 `require` 加载模块。
-
-## *require一个模块他是怎么定位的 
-
-Node.js 在加载模块时会按照以下步骤定位模块：
-
-1. 内置模块：首先 Node.js 会检查模块是否是内置模块，如果是，则直接返回该模块。
-2. 文件模块：如果不是内置模块，Node.js 就会寻找该文件是否存在。如果存在，则加载该文件，并返回该模块。
-3. 目录模块：如果上面的文件不存在，Node.js 会尝试将该模块视为目录，并尝试加载该目录中的 `package.json` 文件或 `index.js` 文件。
-
-如果以上三个步骤都无法定位到该模块，则 Node.js 会抛出一个错误，表示找不到该模块。
+## node事件循环
 
 ## 前端模块化机制有哪些
 
-> 前端模块化是将应用程序分为多个小的模块进行管理，每个模块互相独立，由自己的作用域，提高可维护性减少代码的冗余
-> 常见的由ESMoudle、CommonJS、AMD等
-
-​	前端模块化机制是一种将复杂的应用程序分解成许多小的模块来管理代码的方法。每个模块都是独立的，具有自己的作用域，并且可以被其他模块复用。这样可以保证代码的可读性和可维护性，并且还可以减少代码重复和冗余。
-
-​	主要有CommonJS，AMD 和 ES6 Modules 等
+> 前端模块化机制是一种将复杂的应用程序分解成许多小的模块来管理代码的方法。每个模块都是独立的，具有自己的作用域，并且可以被其他模块复用。保证代码的可读性和可维护性，并且还可以减少代码重复和冗余。
+>
+> 常见的由ESMoudle、CommonJS、AMD、UMD等
+> UMD随处可见，通常在ESM不起作用的情况下用作备用
+> AMD是异步的，适合前端
 
 ## ES module、commonjs 的区别
 
@@ -793,12 +795,12 @@ Node.js 在加载模块时会按照以下步骤定位模块：
 > ESM引入的变量无法修改，CJS引入的变量可以修改
 > ESM加载资源是异步的，CJS加载资源是同步的所以无法在浏览器中使用
 
-​	ES6 Module和CommonJS模块的区别： 
+区别： 
 
 - CommonJS是对模块的浅拷⻉，ES6 Module是对模块的引⽤，即ES6 Module只存只读，不能改变其值，也就是指针指向不能变，类似const；
 - import的接⼝是read-only（只读状态），不能修改其变量值。 即不能修改其变量的指针指向，但可以改变变量内部指针指向，可以对commonJS对重新赋值（改变指针指向），但是对ES6 Module赋值会编译报错。 
 
-​	ES6 Module和CommonJS模块的共同点： 
+共同点： 
 
 - CommonJS和ES6 Module都可以对引⼊的对象进⾏赋值，即对对象内部属性的值进⾏改变。 
 
@@ -821,7 +823,7 @@ Node.js 在加载模块时会按照以下步骤定位模块：
 
 ## JS由哪及部分组成
 
-> ESMAScript核心：规定语法和基本对象
+> ECMAScript核心：规定语法和基本对象
 > DOM：文档对象模型，把整个页面规划成由节点层级构成的文档
 > BOM：浏览器对象模型，与浏览器窗口打开的文档对象进行交互，用于操作浏览器本身的行为，例如，弹出新窗口、移动、调整或关闭当前窗口
 
@@ -833,12 +835,25 @@ Node.js 在加载模块时会按照以下步骤定位模块：
 - 工厂模式：根据不同参数，返回不同类的实例
 - 观察者模式：对象间一对多的依赖关系
 - 发布订阅模式：对象间一对多的依赖关系
-- 装饰者模式：在不改变原对象的基础上，增加新属性/方法/功能
-- 策略模式
+- 装饰模式：在不改变原对象的基础上，增加新属性/方法/功能
+- 策略模式：层级相同的逻辑封装成可以组合和替换的策略方法
+
+## 前端业务下的设计模式
+
+[在前端业务场景下的设计模式 - 掘金 (juejin.cn)](https://juejin.cn/post/6908885198381776910?searchId=20230815174709F389CA6507836CC5FF61#heading-1)
+
+> 1. 策略模式：表单判断
+>    策略模式：将层级相同的逻辑封装成可以组合和替换的策略方法，减少 `if...else` 代码，方便扩展后续功能。
+> 2. 单例模式：全局弹窗
+>    单例模式：一个类只有一个实例，并为该实例提供全局访问点
+> 3. 工厂模式：封装storage
+>    工厂模式：根据不同参数，返回不同类的实例
+> 4. 发布-订阅模式：eventBus 事件通信
+>    发布订阅模式：对象间一对多的依赖关系
 
 ## 发布订阅模式和观察者模式的区别
 
-> 发布订阅模式和观察者模式都是对象间一对多的依赖关系，其中发布订阅模式中，发布者和订阅者不直接通信，而是借助一个发布订阅中心进行统一管理，而观察者模式是一种直接依赖关系，观察者可以直接从被观察者中获取数据。
+> 发布订阅模式和观察者模式都是对象间一对多的依赖关系，其中发布订阅模式中，发布者和订阅者不直接通信，而是借助一个发布订阅中心进行统一管理，而观察者模式是一种直接依赖关系，观察者可以直接从被观察者中获取数据
 
 ## 数组和类数组的区别
 
@@ -873,33 +888,6 @@ Node.js 在加载模块时会按照以下步骤定位模块：
 
 **2.** `obj[key] = undefined;` 这个选择不是这个问题的正确答案，因为只是把某个属性替换为`undefined`，属性本身还在。但是，如果你小心使用它，你可以大大加快一些算法。
 
-## Object.freeze()和Object.seal()
-
-```
-Object.freeze()方法可以冻结一个对象。一个被冻结的对象再也不能被修改；冻结了一个对象则不能向这个对象添加新的属性，不能删除已有属性，不能修改该对象已有属性的可枚举性、可配置性、可写性，以及不能修改已有属性的值。此外，冻结一个对象后该对象的原型也不能被修改。freeze() 返回和传入的参数相同的对象。
-```
-
-**Object.freeze()做了哪些事情？**
-
-设置Object.preventExtension()，禁止添加新属性(绝对存在)
-设置writable为false，禁止修改(绝对存在)
-设置configurable为false，禁止配置(绝对存在)
-禁止更改访问器属性(getter和setter)
-
-```
-Object.seal()方法封闭一个对象，阻止添加新属性并将所有现有属性标记为不可配置。当前属性的值只要可写就可以改变。
-```
-
-**Object.seal()做了哪些事情？**
-
-- 设置Object.preventExtension()，禁止添加新属性(绝对存在)
-- 设置configurable为false，禁止配置(绝对存在)
-- 禁止更改访问器属性(getter和setter)
-
-**对比Object.freeze()和Object.seal()**
-
-使用`Object.freeze()`冻结的对象中的现有属性是不可变的。用`Object.seal()`密封的对象可以改变其现有属性。**Object.seal()封闭比Object.freez()多一个writable:false**
-
 ## JS的特点
 
 > 单线程
@@ -920,11 +908,11 @@ Object.seal()方法封闭一个对象，阻止添加新属性并将所有现有�
 >
 > 多态：允许不同对象对相同消息做出不同响应
 >
-> 面向对象编程能够提供模块化、可扩展和可维护的代码结构，使开发人员更好的管理系统。
+> 面向对象编程能够提供模块化、可扩展和可维护的代码结构，使开发人员更好的管理系统
 
 ## JS为什么是单线程
 
-> Javascript脚本是单线程的，通俗一点就是可以叫做“窗体线程”
+> 通俗一点就是可以叫做“窗体线程”
 >
 > js作为浏览器的脚本语言，主要是实现用户与浏览器的交互，以及操作dom；如果js被设计为了多线程，一个线程修改dom元素，另一个线程要删除dom元素，浏览器就会一脸茫然，不知所措
 >
@@ -934,7 +922,7 @@ Object.seal()方法封闭一个对象，阻止添加新属性并将所有现有�
 
 > Web Worker与Service Worker其实本质上是开启了另外的线程，而我们的Workers开启的新线程并没有所谓”窗体“这个概念，所以在webwork 中使用self
 
-## 为什么要有异步操作
+## 为什么要有异步任务
 
 > js本身是单线程，也就意味折同一时间只能有一段代码片段执行。而浏览器环境中需要等待服务器响应、用户输入点击等事件发生。如果全部使用同步任务执行，那么程序就会出现阻塞，用户体验会非常差
 
@@ -949,8 +937,6 @@ Object.seal()方法封闭一个对象，阻止添加新属性并将所有现有�
 > async await是基于Promise，一个语法糖，内部是generator+promise实现 async函数就是将Generator函数的星号（*）替换成async，将yield替换成await
 
 ## eval()函数
-
-## null和undefined的区别
 
 ## 点击下载本地文件
 
@@ -1243,5 +1229,69 @@ const dataUrl = canvas.toDataURL()
    const objectUrl = URL.createObjectURL(blob)
    ```
 
-   
 
+## Object.freeze()和Object.seal()
+
+```
+Object.freeze()方法可以冻结一个对象。一个被冻结的对象再也不能被修改；冻结了一个对象则不能向这个对象添加新的属性，不能删除已有属性，不能修改该对象已有属性的可枚举性、可配置性、可写性，以及不能修改已有属性的值。此外，冻结一个对象后该对象的原型也不能被修改。freeze() 返回和传入的参数相同的对象。
+```
+
+**Object.freeze()做了哪些事情？**
+
+设置Object.preventExtension()，禁止添加新属性(绝对存在)
+设置writable为false，禁止修改(绝对存在)
+设置configurable为false，禁止配置(绝对存在)
+禁止更改访问器属性(getter和setter)
+
+```
+Object.seal()方法封闭一个对象，阻止添加新属性并将所有现有属性标记为不可配置。当前属性的值只要可写就可以改变。
+```
+
+**Object.seal()做了哪些事情？**
+
+- 设置Object.preventExtension()，禁止添加新属性(绝对存在)
+- 设置configurable为false，禁止配置(绝对存在)
+- 禁止更改访问器属性(getter和setter)
+
+**对比Object.freeze()和Object.seal()**
+
+使用`Object.freeze()`冻结的对象中的现有属性是不可变的。用`Object.seal()`密封的对象可以改变其现有属性。**Object.seal()封闭比Object.freez()多一个writable:false**
+
+## 手动释放内存
+
+> 清空定时器： clearInterval clearTimeout
+> 关闭监听事件：removeEventListener
+> 释放变量：赋值为null
+
+## 栈溢出
+
+> 当一段代码被执行时，JavaScript引擎先会对其进行编译，并创建执行上下文。一般在函数递归没有终止条件时，会一直创建新的函数执行上下文，并反复压在栈中，就会造成栈溢出
+
+## js隐式转换 显示转换
+
+> **显示转换**：人为转换，使代码更清晰可读，例如
+>
+> - 转换为字符串：toString() 或 String()
+> - 转换为数值：Number()、parseInt()、parseFloat()
+> - 转换为布尔值：Boolean()
+> - 转换为对象：Object()
+>
+> **隐式转换**：运算符在运算时，两边数据不统一，编译器会自动将两边数据进行数据类型转换成统一的再计算
+>
+> - 逻辑语句的类型转换：当使用if、while、for 时，隐式转换为布尔值；
+> - 逻辑表达式 !、||、&&
+> - 算数表达式 + - 
+> - ==运算符
+>
+> ```
+> x + ""  // 等价于 String(x)
+> +x      // 等价于 Number(x)，也可以写成 x - 0
+> !!x     // 等价于Boolean(x)
+> !x      // 转换为布尔值，并取反
+> 
+> null == undefined、1 == true、1 == '1'  都为true
+> ```
+
+## reduce第二个参数不传
+
+> 会将数组的第一个值作为初始值，然后从索引为1开始执行回调函数，如果数组为空直接报错或者数组只有一个则不会执行回调函数
