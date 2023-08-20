@@ -2,17 +2,19 @@
 interface vs type，enum，然后内置的实用类型
 ```
 
-## 1. 什么是TypeScript？
+## 什么是TypeScript？
 
 > TS是一个强类型的JS超集，主要用于类型检查，支持面向对象的概念，如类、接口、继承、泛型等。TS并不直接运行在浏览器，而是需要通过编译器编译成JS运行
 
-## 2. 为什么要使用 TypeScript ? TypeScript 相对于 JavaScript 的优势是什么？
+## 为什么要使用 TypeScript ? TypeScript 相对于 JavaScript 的优势是什么？
 
-> 类型检查，增加了静态类型，可以在开发人员编写脚本时检测错误。对于大型项目，有时为了优化改进项目，对代码进行小小更改。这些小小的变化可能会产生严重的、意想不到的后果。使用TS工具来重构更容易快捷
+> 类型提示，易于后期维护，无论是团队开发还是个人开发
+>
+> 类型检查，增加了静态类型，可以让开发人员编写脚本时检测错误，避免低级错误流入到生产上。
 >
 > 更好的协作，为开发团队创建一个更高效的编码和调试过程
 
-## 3. TypeScript 中 const 和 readonly 的区别？枚举和常量枚举的区别？接口和类型别名的区别？面向对象
+## TypeScript 中 const 和 readonly 的区别？枚举和常量枚举的区别？接口和类型别名的区别？面向对象
 
 > const 和 readonly：const可以防止变量的值被修改，readonly可以防止变量的属性被修改
 >
@@ -24,7 +26,7 @@ interface vs type，enum，然后内置的实用类型
 type和interface都是用来描述对象或者函数的类型，type还可以描述一些基本类型，联合类型，元组，但interface不行。type只是个类型取个别名，而interface则是类型的声明。多个interface声明还可以自动合并
 ```
 
-### type和interface的区别
+## type和interface的区别
 
 **type的使用**
 
@@ -217,7 +219,7 @@ any 和 unknown 都代表任意类型，但是 unknown 只能接收任意类型�
 
 unknown不能读取任何属性，方法也不可调用。unknown比any更加安全
 
-### Object object {}
+## Object object {}
 
 在原型链中，所有的基本数据类型和引用数据类型都指向大Object，用Object类型相当于包含所有类型（{} = new Object 所以效果相同)
 
@@ -231,7 +233,7 @@ let obj3: object = 123 / '123' / bool ×
 let obj4: object = [] / {} / () => {} ✔
 ```
 
-### abstract 抽象类
+## abstract 抽象类
 
 ```ts
 // 抽象类
@@ -254,6 +256,7 @@ class Vue2 extends Vue1 {
 }
 ```
 
-### 装饰器
+## 装饰器
 
 装饰器就是一个可以提前拿到类本身（或原型对象）并预处理的函数，当类定义的时候被调用。
+
