@@ -233,7 +233,31 @@ const handler = () => {
 > vue是采用数据劫持和发布订阅模式，通过Object.defineProperty()来劫持data对象中各个属性的getter和setter，在数据发生变动时发布消息给订阅者，触发相应的监听回调。但是会有一个问题，当给data中某个对象新增一个属性的时候，它不会是响应性的，应为defineProperty无法监听到，所以vue提供$set来解决。vue3引入反射和代理的概念，也就是reflect和proxy，创建一个对象的代理，用于在目标对象之前设置一层拦截，从而可以对目标对象的访问进行过滤和改写。在vue3中这样一个过程叫做reactive，但reactive只能代理引用数据类型，所以vue3额外提供ref处理简单数据类型的响应性，ref本质上并没有进行数据的监听而是构建了一个RefImpl的类通过get set标记这个类里面的value函数来实现，所以ref必须要通过.value触发，本质就是调用value函数
 >
 
-> 底层的话，首先对数据进行劫持监听，设置一个监听器Observer，监听所有属性。如果属性更新就告诉订阅者Watcher，因为订阅者有很多个需要有一个消息订阅器Dep来进行统一收集，统一的进行管理。接着还有一个Complie指令解析器，对每个节点元素进行扫描和解析，将相关指令初始化成一个订阅者，并替换数据，执行对应的更新函数，更新视图
+> 底层的话，首先对数据进行劫持监听，组件实例化的时候，监听器Observer也会实例化，对data属性进行遍历，用defineProperty对其进行劫持，针对每个属性会生成该属性的Dep，在get里面调用Dep.depend方法将Dep实例和Watcher实例用一个数组subs进行存储，在set里面调用Dep.notify将对subs进行遍历执行Watcher中绑定的数据更新组件，Watcher是在mount阶段初始化，主动调用一次render，这个时候才会去触发data属性劫持中的get将Watcher和Dep进行关联，响应真实Dom
+
+> 模拟Observer，没考虑递归
+>
+> ```js
+> let data = { name: 'qwe' }
+> // 创建一个监听的实例对象，用于监视data中属性的变化
+> const obs = new Observer(data)
+> function Observer(obj) {
+>     // 汇总对象中所有的属性形成一个数组
+>     const keys = Object.keys()
+>     keys.forEach(item => {
+>         // 这里的this指的obs实例，给实例添加属性
+>         Object.defineProperties(this, item, {
+>             get() {
+>                 return obj[item]
+>             },
+>             set(value) {
+>                 // ...解析模板，生成虚拟dom...
+>                 obj[item] = value
+>             }
+>         })
+>     })
+> }
+> ```
 
 首先要对数据进行`劫持监听`，所以我们需要设置一个监听器 `Observer`，用来监听所有属性。如果属性发上变化了，就需要告诉订阅者 `Watcher` 看是否需要更新。
 
@@ -246,6 +270,19 @@ const handler = () => {
 - 实现一个监听器 `Observer`，用来劫持并监听所有属性，如果有变动的，就通知订阅者。
 - 实现一个订阅者 `Watcher`，可以收到属性的变化通知并执行相应的函数，从而更新视图。
 - 实现一个解析器 `Compile`，可以扫描和解析每个节点的相关指令，并根据初始化模板数据以及初始化相应的订阅器。
+
+## Vue template 到render的过程
+
+> 首先会调用Parse方法对template解析生成AST抽象语法树，然后对静态节点做优化，深度遍历对静态节点进行标记，为后续更新渲染可以直接跳过静态节点做优化，然后调用generate将抽象语法树编译成render字符串，再通过new Function(render)生成render函数
+
+```js
+// 调用parse方法将template转化为ast（抽象语法树）
+const ast = parse(template.trim(), options)
+// 对静态节点做优化
+optimize(ast,options)
+// 生成代码
+const code = generate(ast, options)
+```
 
 ## vue3有哪些改变
 
@@ -293,10 +330,11 @@ const handler = () => {
 > 实质是调用patch函数，比较新旧节点，一边比较一边给真实DOM打补丁
 >
 > 在新老虚拟DOM对比时：首先对比节点本身，判断是否为同一级节点，这里主要比较标签名和key，如果标签名不同则为不同节点，直接删除该节点重新创建节点进行替换不用进行深度遍历；如果标签名相同key也相同则为相同节点，则也不用进行深度遍历。这也就是为什么v-for要写key的作用，会更有效更新虚拟DOM；如果key不同，则进行patchVnode，判断该节点的子节点，如果新节点没有子节点直接删除旧的子节点，如果都有子节点，进行updateChildren，然后对新旧节点的子节点进行操作，也就是diff的核心。
-> diff核心收尾指针（双端比较法）头对头 尾对尾 新头的老尾 老头对新尾
+> diff核心收尾指针（双端比较法）头对头 尾对尾 新头的老尾 老头对新尾，进行4次比对，如果4次找寻到key下相同则进行复用，若都没有匹配，就会在新的Vdom的队头开始再去寻找，看老的Vdom有没有对应的元素进行相应的移动删除和创建
 >
-> 而vue3中采用了Patch Flag的diff算法，它会标记每个节点需要更新的类型，进行diff比较的时候直接定位需要更新的节点，而不必再对整颗树进行完整的比较，可以更快的更新页面，提升性能。
-> patchKeyedChildren基于最长递增子序列进行移动添加删除
+> 而vue3中采用了双端快速diff，核心是patchKeyedChildren基于最长递增子序列进行移动添加删除，在生成VNode的时候，同时打上标记，也就是Patch Flag，patch过程中就会判断这个标记来 优化diff，跳过一些静态节点对比，具体的话也有两个指针，新老Vdom各有两个，只对比两种情况，队头和队头，队尾和队尾，如果没有匹配上，对新的Vdom进行最长递增子序列的计算，也就是寻找依次递增的元素，这些元素就是固定的，再去寻找不是这些元素的Vdom去和老的Vdom进行对比，总的来说，新旧虚拟dom不用对整颗树进行完整的比较，可以更快的更新页面，提升性能
+>
+> V3的时间复杂度是O(nlogn)，V2时间复杂度O(n)，虽然V3的复杂度更高，核心是为了减少dom的移动，损失js一点性能来提升浏览器dom的渲染效率
 
 ## key的作用
 
@@ -322,19 +360,6 @@ const handler = () => {
 ## data为什么写成函数形式
 
 > 在 Vue 中组件是可以复用的，一个组件被创建好之后，就可以被用在其他各个地方，而组件不管被复用了多少次，组件中的 data 数据应该是相互不影响的。基于数据不影响的理念，组件被复用一次，data 数据就应该被复制一次，data 是函数，每一个函数都会有自己的存储空间，函数每次执行都会创建自己的执行上下文，相互不影响。函数类似于给每个组件实例创建一个私有的数据空间，让各个组件实例维护各自的数据。而单纯的写成对象形式，这些实例都是同一个构造函数，就使得所有组件实例共用了一份 data，就会造成一个变了全都会变的结果。
-
-## Vue template 到render的过程
-
-> 首先会调用Parse方法对template解析生成AST抽象语法树，然后对静态节点做优化，深度遍历对静态节点进行标记，为后续更新渲染可以直接跳过静态节点做优化，然后调用generate将抽象语法树编译成render字符串，再通过new Function(render)生成render函数
-
-```js
-// 调用parse方法将template转化为ast（抽象语法树）
-const ast = parse(template.trim(), options)
-// 对静态节点做优化
-optimize(ast,options)
-// 生成代码
-const code = generate(ast, options)
-```
 
 ## SPA单页面理解，优缺点
 
