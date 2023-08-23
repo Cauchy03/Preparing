@@ -306,9 +306,13 @@ const code = generate(ast, options)
 
 > keep alive是一个内置组件，它不会出现在父组件链中，也不会出现在dom元素中，当包裹一个动态组件的时候，该组件会被缓存到内存当中，而不是销毁，内置提供一些钩子函数，可以让我们组件缓存和激活时执行一些额外的逻辑，当组件被换掉时，会被缓存到内存当中、触发deactivated生命周期，当组件被切回来时，再去缓存里找这个组件、触发activated生命周期，主要避免在组件切换时重复渲染和销毁
 
-## $nextTick
+## nextTick
 
 > 监听到数据发生变化后，视图并不会立即同步渲染，vue而是开启一个队列，并缓冲同一事件循环中发生的所有数据变更。在下一个事件循环tick中，刷新队列并执行相应操作。也就是将回调延迟到下一次DOM更新循环之后执行，也是利用原生JS的promise、MutationObserver、setImmediate、setTimeout方法模拟实现对应的微任务和宏任务，通过这些异步回调任务队列来实现vue框架中自己的异步回调队列
+>
+> **使用原生的 setTimeout 方法**：在 [Vue.js](http://vue.js/) 2.x 中，如果浏览器支持 Promise，则会优先使用 [Promise.then](http://promise.then/)() 方法。如果不支持 Promise，则会使用原生的 setTimeout 方法模拟异步操作。
+> **使用 MutationObserver**：如果浏览器支持 MutationObserver，[Vue.js](http://vue.js/) 会使用 MutationObserver 监听 DOM 更新，并在 DOM 更新完成后执行回调函数。
+> **使用 setImmediate**：在 IE 中，setImmediate 方法可以用来延迟异步执行任务。在 [Vue.js](http://vue.js/) 2.x 中，如果浏览器支持 setImmediate，则会优先使用 setImmediate，否则会使用 setTimeout。
 >
 > 作用：减少操作DOM的次数，频繁的操作DOM更新很耗性能
 
@@ -452,3 +456,5 @@ const code = generate(ast, options)
 > 双向数据绑定，是利用V-model实现，也是一个语法糖通过给表单元素绑定数据和监听input事件实现
 >
 > 单项数据流，父组件可以向子组件传递props，子组件不能修改props，只能通过事件通知父组件数据更改
+
+uniapp为什么能多端发布
