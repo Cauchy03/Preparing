@@ -22,7 +22,7 @@
 
 **重排或回流(`reflow`)：**
 
-概念：当DOM的变化影响了元素的几何信息(元素的的位置和尺寸大小)，浏览器需要重新计算元素的几何属性，将其安放在界面中的正确位置，这个过程叫做重排。
+概念：当DOM的变化影响了元素的几何信息(元素的的位置和尺寸大小)，浏览器需要重新计算元素的几何属性，将其安放在界面中的正确位置，这个过程叫做重排
 
 重排也叫回流，简单的说就是重新生成布局，重新排列元素
 
@@ -34,7 +34,7 @@
 
 **重绘(`Repaints`):**
 
-概念：当一个元素的外观发生改变，但没有改变布局,重新把元素外观绘制出来的过程，叫做重绘。
+概念：当一个元素的外观发生改变，但没有改变布局,重新把元素外观绘制出来的过程，叫做重绘
 
 [重排(`reflow`)和重绘(`repaint`) - 掘金](https://juejin.cn/post/6844904083212468238)
 
@@ -45,9 +45,9 @@
 盒模型都是由四个部分组成的，分别是 margin、border、padding 和 content，根据盒子的计算方式不同也就是设置height和width，分为了标准盒模型和怪异盒模型
 
 - 标准盒模型的 width 和 height 属性的范围只包含了 content，
-- IE 盒模型的 width 和 height 属性的范围包含了 border、padding 和 content。
+- IE 盒模型的 width 和 height 属性的范围包含了 border、padding 和 content
 
-可以通过修改元素的 box-sizing 属性来改变元素的盒模型：
+可以通过修改元素的 box-sizing 属性来改变元素的盒模型
 
 - `box-sizing: content-box`表示标准盒模型（默认值）
 - `box-sizing: border-box`表示 IE 盒模型（怪异盒模型）
@@ -236,12 +236,12 @@ Flex 是 FlexibleBox 的缩写，意为"弹性布局"，用来为盒状模型提
 
 以下 6 个属性设置在**容器上**：
 
-- flex-direction 属性决定主轴的方向（即项目的排列方向）。
-- flex-wrap 属性定义，如果一条轴线排不下，如何换行。
-- flex-flow 属性是 flex-direction 属性和 flex-wrap 属性的简写形式，默认值为 row nowrap。
-- justify-content 属性定义了项目在主轴上的对齐方式。
-- align-items 属性定义项目在交叉轴上如何对齐。
-- align-content 属性定义了多根轴线的对齐方式。如果项目只有一根轴线，该属性不起作用。
+- flex-direction 属性决定主轴的方向（即项目的排列方向）
+- flex-wrap 属性定义，如果一条轴线排不下，如何换行
+- flex-flow 属性是 flex-direction 属性和 flex-wrap 属性的简写形式，默认值为 row nowrap
+- justify-content 属性定义了项目在主轴上的对齐方式
+- align-items 属性定义项目在交叉轴上如何对齐
+- align-content 属性定义了多根轴线的对齐方式。如果项目只有一根轴线，该属性不起作用
 
 以下 6 个属性设置在**项目上(子元素)**：
 
@@ -250,7 +250,7 @@ Flex 是 FlexibleBox 的缩写，意为"弹性布局"，用来为盒状模型提
 - flex-shrink 属性定义了项目的缩小比例，默认为 1，即如果空间不足，该项目将缩小。
 - flex-basis 属性定义了在分配多余空间之前，项目占据的主轴空间。浏览器根据这个属性，计算主轴是否有多余空间。它的默认值为 auto，即项目的本来大小。
 - flex 属性是 flex-grow，flex-shrink 和 flex-basis 的简写，默认值为 0 1 auto。
-- align-self 属性允许单个项目有与其他项目不一样的对齐方式，可覆盖 align-items 属性。默认值为 auto，表示继承父元素的 align-items 属性，如果没有父元素，则等同于 stretch。
+- align-self 属性允许单个项目有与其他项目不一样的对齐方式，可覆盖 align-items 属性。默认值为 auto，表示继承父元素的 align-items 属性，如果没有父元素，则等同于 stretch
 
 ## 10. `flex:1`是什么组成的
 
