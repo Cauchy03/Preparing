@@ -458,3 +458,42 @@ const code = generate(ast, options)
 > 单项数据流，父组件可以向子组件传递props，子组件不能修改props，只能通过事件通知父组件数据更改
 
 ## uniapp为什么能多端发布
+
+## vue2/3 自定义指令
+
+vue3指令钩子，和vue指令相似
+
+```js
+const myDirective = {
+  // 在绑定元素的 attribute 前
+  // 或事件监听器应用前调用
+  created(el, binding, vnode, prevVnode) {
+    // 下面会介绍各个参数的细节
+  },
+  // 在元素被插入到 DOM 前调用
+  beforeMount(el, binding, vnode, prevVnode) {},
+  // 在绑定元素的父组件
+  // 及他自己的所有子节点都挂载完成后调用
+  mounted(el, binding, vnode, prevVnode) {},
+  // 绑定元素的父组件更新前调用
+  beforeUpdate(el, binding, vnode, prevVnode) {},
+  // 在绑定元素的父组件
+  // 及他自己的所有子节点都更新后调用
+  updated(el, binding, vnode, prevVnode) {},
+  // 绑定元素的父组件卸载前调用
+  beforeUnmount(el, binding, vnode, prevVnode) {},
+  // 绑定元素的父组件卸载后调用
+  unmounted(el, binding, vnode, prevVnode) {}
+}
+```
+
+vue2指令钩子
+
+- `bind`：只调用一次，指令第一次绑定到元素时调用。在这里可以进行一次性的初始化设置。
+- `inserted`：被绑定元素插入父节点时调用 (仅保证父节点存在，但不一定已被插入文档中)。
+- `update`：所在组件的 VNode 更新时调用，**但是可能发生在其子 VNode 更新之前**。指令的值可能发生了改变，也可能没有。但是你可以通过比较更新前后的值来忽略不必要的模板更新
+
+- `componentUpdated`：指令所在组件的 VNode **及其子 VNode** 全部更新后调用。
+- `unbind`：只调用一次，指令与元素解绑时调用。
+
+> bind 函数被替换成了beforeMounted，update 被移除，componentUpdated 被替换成了updated，unbind 被替换成了 unmounted，inserted 被移除
