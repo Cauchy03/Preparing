@@ -185,6 +185,13 @@ for (let i = 1; i <= 5; i++) {
 }
 ```
 
+## 普通的Object对象和Map
+
+> 1. 键的类型：普通对象，键只能是字符串或符号（Symbol）类型； Map 对象，键可以是任意数据类型
+> 2. 遍历：普通对象不能用for of遍历，可以通过 `for...in` 循环或 `Object.keys()`、`Object.values()` 和 `Object.entries()` 方法来遍历属性和值；map可以通过for of遍历或 `Map.prototype.forEach()` 
+> 3. 键值对数量：普通对象没有内置的方法来获取，可以通过手动计算属性的数量来实现；Map 对象具有 `size` 属性，可以直接获取存储的键值对数量
+> 4. 插入顺序：Map 元素的顺序遵循插入的顺序，object没有这一特性
+
 ## null和undefined的区别
 
 > null表示"没有对象"，即该处不应该有值，需要释放一个对象时，直接赋值为 null 即可，例如闭包
