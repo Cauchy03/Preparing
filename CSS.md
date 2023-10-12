@@ -142,7 +142,7 @@ p:first-child {color: red}
 
 ## 7. 什么是`BFC`，`BFC`有什么作用，如何形成`BFC`
 
-> BFC是块级格式化上下文，是css的渲染的一部分，是一块独立的渲染区域，不会影响边界外的元素。一般可以通过overflow：hidden、浮动、定位、display:inline-block等创建，可以解决margin重叠、父元素高度塌陷、阻止元素被浮动元素重叠的问题
+> BFC是块级格式化上下文，是css的渲染的一部分，是一块独立的渲染区域，不会影响边界外的元素。一般可以通过overflow:hidden（值不为visible）、浮动（float属性不是none）、定位（position属性为fixed或absolute）、display:inline-block等创建，可以解决margin重叠、父元素高度塌陷、阻止元素被浮动元素重叠的问题
 
 先来看两个相关的概念：
 
