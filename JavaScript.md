@@ -749,9 +749,24 @@ function myNonEssentialWork (deadline: Dealine) {
 
 总的来说，如果您需要动画效果，可以使用 `requestAnimationFrame`；如果您需要在浏览器空闲时执行任务，则可以使用 `requestIdleCallback`。
 
+## 什么时候会执行requestIdleCallback
+
+> 60FPS，一帧16.6ms
+>
+> 第一种情况：一帧里面会执行
+>
+> 1. 用户事件比如click，scroll，input，change等
+> 2. 定时器任务
+> 3. requestAnimationFrame
+> 4. dom的回流重绘
+> 5. 更新图层的绘制指令
+> 6. 绘制指令合并主线程，若有空余时间执行requestIdleCallback
+>
+> 第二种情况：没有任务执行，浏览器会有50ms空闲时间，这个时间段也可以执行requestIdleCallback
+
 ## requestAnimationFrame和setTimeout/setInterval
 
-> requestAnimationFrame是专门为动画提供的API，间隔时间是由浏览器自身决定的，大约是`17毫秒`左右。它的刷新频率与显示器的频率保持一致，可以解决用 setTimeout/setInterval 制作动画卡顿的情况
+> requestAnimationFrame是专门为动画提供的API，间隔时间是由浏览器自身决定的，大约是`16.6毫秒`左右。它的刷新频率与显示器的频率保持一致，可以解决用 setTimeout/setInterval 制作动画卡顿的情况
 >
 > setTimeout/setInterval属于宏任务，其他任务会阻塞或延迟js任务的执行，导致定时器不准的情况；还有就是刷新频率受屏幕分辨率和屏幕尺寸的影响，因此不同设备的屏幕刷新频率可能会不同，而 `setTimeout` 只能设置一个固定的时间间隔，这个时间不一定和屏幕的刷新时间相同
 >
@@ -811,7 +826,15 @@ function myNonEssentialWork (deadline: Dealine) {
 
 共同点： 
 
-- CommonJS和ES6 Module都可以对引⼊的对象进⾏赋值，即对对象内部属性的值进⾏改变。 
+- CommonJS和ES6 Module都可以对引⼊的对象进⾏赋值，即对对象内部属性的值进⾏改变。
+
+## AMD UMD
+
+> 目前绝大多数第三库都支持AMD规范，但是使用起来相对复杂，除了业务代码还涉及define，而且如果项目模块划分过于细致，同一个页面对js文件的请求次数就会特别多，导致页面效率低下，AMD是前端模块化道路演进的一步
+>
+> UMD像是AMD和CJS的糅合，兼容多种环境，AMD是用于浏览器异步加载，CJS用于服务器，同步加载，UMD则浏览器和服务器都可以运用，也通常在ESM不起作用的时候使用
+>
+> UMD可以直接script引入
 
 ## 说下 generator 原理
 
@@ -1094,7 +1117,7 @@ function  Func(name,age) {
     }
 }
 console.log(Func())  // {a:1}
-console.log(new Func('tom',18)) //{a:1}
+console.log(new Func('tom',18)) // {a:1}
 ```
 
 ## JS二进制
