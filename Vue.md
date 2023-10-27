@@ -348,7 +348,7 @@ const code = generate(ast, options)
 
 ## vue的路由模式
 
-> hash模式：路径中会有一个#，#后面的路径叫hash值，不会随着http请求发送给服务器，还可以个hash改变监听事件，
+> hash模式：路径中会有一个#，#后面的路径叫hash值，不会随着http请求发送给服务器，还可以给hash改变监听事件
 >
 > ```js
 > window.addEventListener("hashchange", funcRef, false);
